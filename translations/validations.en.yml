@@ -1,0 +1,7 @@
+required: %key% field is required.
+string: %key% field must be string.
+numeric: %key% field must be numeric.
+incorrect: The %key% value is incorrect.
+max: The length of the field must be less than %key%.
+min: The length of the field must be greater than %key%.
+numeric_equal: The length of the field must be numeric and equal to %key%.

@@ -1,0 +1,8 @@
+error:
+  user:
+    already_exists: User already exists.
+  validation_failed: User data validation failed.
+
+info:
+  user:
+    signup_success: Successfully singed up.
