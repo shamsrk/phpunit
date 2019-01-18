@@ -1,9 +1,6 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: shams
- * Date: 20/12/18
- * Time: 1:13 PM
+ * UserController to handle the user activities like sign up, log in
  */
 
 namespace AppBundle\Controller\users;
@@ -38,8 +35,9 @@ class UserController extends Controller
     {
         $requestData = $request->request->all();
 
+        // Create session and store the locale
         $session = $request->getSession();
-        $session->set('locale', $request->getLocale());
+        $session->set(Key::LOCALE, $request->getLocale());
 
         // Validate request data
         $validator = Validator::validate($requestData, [
@@ -52,6 +50,7 @@ class UserController extends Controller
 
         try {
             if (!$validator->fails()) {
+                // Load mongodb manager
                 $dm = $this->get('doctrine_mongodb')->getManager();
 
                 // Validate email uniqueness
@@ -72,7 +71,7 @@ class UserController extends Controller
 
                     GenericService::$response = array_merge(
                         MessageConstants::$generalInfo['SIGNUPSUCCESS'], [Key::DATA => $requestData]
-                        );
+                    );
                 }
 
             } else {

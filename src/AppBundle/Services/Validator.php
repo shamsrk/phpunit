@@ -1,39 +1,65 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: shams
- * Date: 20/12/18
- * Time: 1:47 PM
- */
-
 namespace AppBundle\Services;
+
 use AppBundle\Constants\KeyConstants as Key;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\Translator;
 
-
+/**
+ * Validator class to validate the request data
+ */
 class Validator
 {
+    /*
+     * Validation errors
+     *
+     * @var array
+     */
     protected static $errors = [];
 
+    /*
+     * error flag
+     *
+     * @var boolean
+     */
     protected static $hasError = false;
 
+    /*
+     * Validator instance
+     *
+     * @var Validator
+     */
     private static $instance;
 
+    /**
+     * Create it if it doesn't exist.
+     *
+     * @return Validator
+     */
     public static function getInstance()
     {
-        // Create it if it doesn't exist.
         if (!self::$instance) {
             self::$instance = new Validator();
         }
         return self::$instance;
     }
 
+    /**
+     * Validate the request data with different criteria
+     *
+     * @param array $data
+     * @param array $rules
+     * @param array|null $messages
+     * @return Validator
+     * @throws \Exception
+     */
     public static function validate(array $data, array $rules, array $messages = null)
     {
-
+        // Create session instance
         $session = new Session();
+
+        // Create translator and load message file resource to get the messages based on the locale
         $translator = new Translator($session->get(Key::LOCALE));
         $translator->addLoader('yaml', new YamlFileLoader());
         $translator->addResource(
@@ -42,17 +68,19 @@ class Validator
             $session->get(Key::LOCALE)
         );
 
-        // Create it if it doesn't exist.
+        // Create validator object if it does not exist.
         $validator = self::getInstance();
 
         $errors = [];
 
+        // Check all the rules and validate the corresponding data
         foreach ($rules as $k => $rule) {
             $rs = explode('|', $rule);
 
             foreach ($rs as $r) {
                 if (!empty($r) && !isset($validator::$errors[$k])) {
                     switch ($r) {
+                        // required field validation
                         case Key::REQUIRED:
                             if (!(isset($data[$k]) && !empty($data[$k]))) {
                                 $validator::$hasError = true;
@@ -62,6 +90,7 @@ class Validator
                             }
                             break;
 
+                        // string data type validation
                         case Key::STRING:
                             if (!is_string($data[$k])) {
                                 $validator::$hasError = true;
@@ -70,6 +99,7 @@ class Validator
                             }
                             break;
 
+                        // numeric data type validation
                         case Key::NUMERIC:
                             if (!is_numeric($data[$k])) {
                                 $validator::$hasError = true;
@@ -78,6 +108,7 @@ class Validator
                             }
                             break;
 
+                        // maximum length validation
                         case ((strpos($r, Key::MAX) !== false) ? $r : false):
                             $sr = explode(':', $r);
                             $ml = (int)end($sr);
@@ -93,6 +124,7 @@ class Validator
                             }
                             break;
 
+                        // minimum length validation
                         case ((strpos($r, Key::MIN) !== false) ? $r : false):
                             $sr = explode(':', $r);
                             $ml = (int)end($sr);
@@ -108,6 +140,7 @@ class Validator
                             }
                             break;
 
+                        // digits data type validation
                         case ((strpos($r, Key::DIGITS) !== false) ? $r : false):
                             $sr = explode(':', $r);
                             $ml = (int)end($sr);
@@ -137,15 +170,23 @@ class Validator
         return $validator;
     }
 
+    /**
+     * check the validation status
+     *
+     * @return bool
+     */
     public function fails()
     {
         return self::$hasError;
     }
 
+    /**
+     * Get the validation errors
+     *
+     * @return array
+     */
     public function validationErrors()
     {
         return self::$errors;
     }
-
-
 }
