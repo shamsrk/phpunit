@@ -1,8 +1,11 @@
 error:
   user:
     already_exists: User already exists.
+    not_exists: User does not exists.
+    invalid_password: Password is incorrect.
   validation_failed: User data validation failed.
 
 info:
   user:
     signup_success: Successfully singed up.
+    signin_success: Successfully signed in.

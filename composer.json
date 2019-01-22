@@ -7,6 +7,7 @@
         "psr-4": {
             "AppBundle\\": "src/AppBundle"
         },
+        "files": ["src/AppBundle/Helpers/Resources/functions/helper.php"],
         "classmap": [ "app/AppKernel.php", "app/AppCache.php" ]
     },
     "autoload-dev": {

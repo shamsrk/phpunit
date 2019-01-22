@@ -19,6 +19,28 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class User implements UserInterface
 {
+    /*
+     * fillable attributes, which can mass assign into and fetch from database.
+     */
+    protected $fillables = [
+        'id', 'name', 'email', 'username', 'phoneNumber', 'address', 'dob', 'sessionId', 'lastActiveAt'
+    ];
+
+    /**
+     * Function to get all the mass assignable attributes and data
+     *
+     * @return array
+     */
+    public function get()
+    {
+        $data = [];
+        array_map(function ($attribute) use (&$data) {
+            $data[$attribute] = $this->$attribute;
+        }, $this->fillables);
+
+        return $data;
+    }
+
     /**
      * @MongoDB\Id
      */
@@ -59,6 +81,11 @@ class User implements UserInterface
     /**
      *@MongoDB\Field(type="string")
      */
+    private $plainPassword;
+
+    /**
+     *@MongoDB\Field(type="string")
+     */
     protected $password;
 
     /**
@@ -72,13 +99,46 @@ class User implements UserInterface
     protected $updatedAt;
 
     /**
-     * @ORM\Column(type="array")
+     *@MongoDB\Field(type="string")
      */
-    private $roles;
+    protected $sessionId;
+
+    /**
+     *@MongoDB\Field(type="date")
+     */
+    protected $lastActiveAt;
+
+    /**
+     *@MongoDB\Field(type="string")
+     */
+    protected $deviceId;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $roles;
 
     public function __construct()
     {
-        $this->roles = ['ROLE_USER'];
+        $this->roles = serialize(['ROLE_USER']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getRoles()
+    {
+        return unserialize($this->roles);
+    }
+
+    /**
+     * @param array $roles
+     * @return User
+     */
+    public function setRoles(array $roles)
+    {
+        $this->roles = serialize(array_merge($this->getRoles(), $roles));
+        return $this;
     }
 
     /**
@@ -127,6 +187,16 @@ class User implements UserInterface
         return $this->email;
     }
 
+    /**
+     * Function to set username
+     *
+     * @return User
+     */
+    public function setUsername($username): User
+    {
+        $this->username = $username;
+        return $this;
+    }
 
     /**
      * Function to get username
@@ -194,6 +264,20 @@ class User implements UserInterface
     public function getDob()
     {
         return $this->dob;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlainPassword()
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword($password)
+    {
+        $this->plainPassword = $password;
+        return $this;
     }
 
     /**
@@ -281,17 +365,62 @@ class User implements UserInterface
         $this->updatedAt = new \DateTime();
     }
 
-    /**
-     * Function to get role
-     *
-     * @return array
-     */
-    public function getRoles()
-    {
-        return $this->roles;
-    }
-
     public function eraseCredentials()
     {
+    }
+
+    /**
+     * @param MongoDB\Date $lastActiveAt
+     *
+     * @return User
+     */
+    public function setLastActiveAt($lastActiveAt): User
+    {
+        $this->lastActiveAt = $lastActiveAt;
+        return $this;
+    }
+
+    /**
+     * @return MongoDB\Date
+     */
+    public function getLastActiveAt()
+    {
+        return $this->lastActiveAt;
+    }
+
+    /**
+     * @param string $sessionId
+     * @return User
+     */
+    public function setSessionId($sessionId)
+    {
+        $this->sessionId = $sessionId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSessionId()
+    {
+        return $this->sessionId;
+    }
+
+    /**
+     * @param string $deviceId
+     * @return User
+     */
+    public function setDeviceId($deviceId)
+    {
+        $this->deviceId = $deviceId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceId()
+    {
+        return $this->deviceId;
     }
 }

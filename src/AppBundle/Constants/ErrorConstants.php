@@ -14,7 +14,9 @@ final class ErrorConstants
      * @var array
      */
     public static $generalErrors = [
-        'ALREADYEXISTS' => ['code' => 409, 'status' => 'failed', 'message' => 'error.user.already_exists'],
-        'VALIDATIONFAIL' => ['code' => 406, 'status' => 'failed', 'message' => 'error.validation_failed'],
+        'ALREADY_EXISTS' => ['code' => 409, 'status' => 'failed', 'message' => 'error.user.already_exists'],
+        'NOT_EXISTS' => ['code' => 403, 'status' => 'failed', 'message' => 'error.user.not_exists'],
+        'VALIDATION_FAIL' => ['code' => 406, 'status' => 'failed', 'message' => 'error.validation_failed'],
+        'INVALID_PASSWORD' => ['code' => 401, 'status' => 'failed', 'message' => 'error.user.invalid_password'],
     ];
 }

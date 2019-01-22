@@ -39,10 +39,7 @@ class Validator
     public static function getInstance()
     {
         if (!self::$instance) {
-            print_r('new object');
             self::$instance = new Validator();
-        } else {
-            print_r('old object');
         }
         return self::$instance;
     }

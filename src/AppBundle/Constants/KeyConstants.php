@@ -15,6 +15,7 @@ final class KeyConstants
     const TRANS_KEY = '%key%';
     const NAME = 'name';
     const EMAIL = 'email';
+    const USERNAME = 'username';
     const PHONE = 'phone';
     const ADDRESS = 'address';
     const DOB = 'dob';
@@ -32,6 +33,9 @@ final class KeyConstants
     const MIN = 'min';
     const LOCALE = 'locale';
     const INCORRECT = 'incorrect';
+    const SESSION_ID = 'session_id';
+    const DEVICE_ID = 'device_id';
+    const DOCTRINE_MONGODB = 'doctrine_mongodb';
 
     public static function getPasswordKey(){
         return 'password';

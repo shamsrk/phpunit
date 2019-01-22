@@ -1,10 +1,6 @@
 <?php
-/**
- * UserController to handle the user activities like sign up, log in
- */
 
 namespace AppBundle\Controller\users;
-
 
 use AppBundle\Constants\ErrorConstants;
 use AppBundle\Constants\MessageConstants;
@@ -19,12 +15,15 @@ use Symfony\Component\Routing\Annotation\Route;
 use AppBundle\Constants\KeyConstants as Key;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
+/**
+ * UserController to handle the user activities like sign up, log in
+ */
 class UserController extends Controller
 {
     /**
      * Function to signup
      *
-     * @Route("/signup", name="create_product")
+     * @Route("/signup", name="signup")
      *
      * @param Request $request
      * @return JsonResponse
@@ -38,6 +37,7 @@ class UserController extends Controller
         $validator = Validator::validate($requestData, [
             Key::NAME => 'required|max:255|min:5',
             Key::EMAIL => 'required|max:255',
+            Key::USERNAME => 'required|max:255|min:5',
             Key::PHONE => 'digits:10',
             Key::ADDRESS => 'string|max:255',
             Key::getPasswordKey() => 'required|string|max:25|min:5'
@@ -46,11 +46,11 @@ class UserController extends Controller
         try {
             if (!$validator->fails()) {
                 // Load mongodb manager
-                $dm = $this->get('doctrine_mongodb')->getManager();
+                $dm = $this->get(Key::DOCTRINE_MONGODB)->getManager();
 
                 // Validate email uniqueness
                 if ((boolean)$dm->getrepository(User::class)->findOneBy([Key::EMAIL => $requestData[Key::EMAIL]])) {
-                    GenericService::$response = ErrorConstants::$generalErrors['ALREADYEXISTS'];
+                    GenericService::$response = ErrorConstants::$generalErrors['ALREADY_EXISTS'];
                 } else {
                     $user = new User();
 
@@ -58,6 +58,7 @@ class UserController extends Controller
 
                     $user->setName($requestData[Key::NAME])
                         ->setEmail($requestData[Key::EMAIL])
+                        ->setUsername($requestData[Key::USERNAME])
                         ->setAddress($requestData[Key::ADDRESS])
                         ->setPhoneNumber($requestData[Key::PHONE])
                         ->setDob($requestData[Key::DOB])
@@ -68,17 +69,90 @@ class UserController extends Controller
                     unset($requestData[Key::getPasswordKey()]);
 
                     GenericService::$response = array_merge(
-                        MessageConstants::$generalInfo['SIGNUPSUCCESS'], [Key::DATA => $requestData]
+                        MessageConstants::$generalInfo['SIGNUP_SUCCESS'], [Key::DATA => $requestData]
                     );
                 }
 
             } else {
                 GenericService::$response = array_merge(
-                    ErrorConstants::$generalErrors['VALIDATIONFAIL'], [Key::DATA => $validator->validationErrors()]
+                    ErrorConstants::$generalErrors['VALIDATION_FAIL'], [Key::DATA => $validator->validationErrors()]
                 );
             }
         } catch (\Exception $exception) {
             GenericService::$response[Key::MESSAGE] = $exception->getMessage();
+        }
+
+        return new JsonResponse(GenericService::getResponse(
+            $this->get('translator')->trans(GenericService::$response[Key::MESSAGE]))
+        );
+    }
+
+    /**
+     * Function to signin
+     *
+     * @Route("/signin", name="signin")
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function loginAction(Request $request)
+    {
+        $requestData = $request->request->all();
+
+        // Validate request data
+        $validator = Validator::validate($requestData, [
+            Key::USERNAME => Key::REQUIRED,
+            Key::getPasswordKey() => Key::REQUIRED,
+            Key::DEVICE_ID => Key::REQUIRED
+        ]);
+
+        try {
+
+            if (!$validator->fails()) {
+                // Load mongodb manager
+                $dm = $this->get(Key::DOCTRINE_MONGODB)->getManager();
+
+                // Get user data, if present in database
+                $user = $dm->getrepository(User::class)->findOneBy([Key::EMAIL => $requestData[Key::USERNAME]]);
+
+                if (!(boolean)$user) {
+                    GenericService::$response = ErrorConstants::$generalErrors['NOT_EXISTS'];
+                } else {
+                    // Get the encoder for the users password
+                    $encoder_service = $this->get('security.encoder_factory');
+                    $encoder = $encoder_service->getEncoder($user);
+
+                    // Note the difference
+                    if ($encoder->isPasswordValid($user->getPassword(),
+                        $requestData[Key::getPasswordKey()], $user->getSalt())) {
+                        // update the sessionId, lastActiveAt, devicedId
+                        $user->setSessionId(generateToken())
+                            ->setLastActiveAt(new \DateTime())
+                            ->setDeviceId($requestData[Key::DEVICE_ID]);
+                        $dm->persist($user);
+                        $dm->flush();
+
+                        GenericService::$response = array_merge(
+                            MessageConstants::$generalInfo['SIGNIN_SUCCESS'], [Key::DATA => $user->get()]
+                        );
+
+                    } else {
+                        // Password invalid
+                        GenericService::$response = ErrorConstants::$generalErrors['INVALID_PASSWORD'];
+                    }
+                }
+
+            } else {
+                GenericService::$response = array_merge(
+                    ErrorConstants::$generalErrors['VALIDATION_FAIL'], [Key::DATA => $validator->validationErrors()]
+                );
+            }
+
+        } catch (\Exception $exception) {
+
+            GenericService::$response[Key::MESSAGE] = $exception->getMessage();
+
         }
 
         return new JsonResponse(GenericService::getResponse(
@@ -93,9 +167,8 @@ class UserController extends Controller
      */
     public function getUsers()
     {
-        $dm = $this->get('doctrine_mongodb')->getManager();
+        $dm = $this->get(Key::DOCTRINE_MONGODB)->getManager();
         $users = $dm->getrepository(User::class)->findAll();
-        dd($users);
         return new JsonResponse($users);
 
     }
