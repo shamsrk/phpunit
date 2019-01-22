@@ -2,7 +2,6 @@
 namespace AppBundle\Services;
 
 use AppBundle\Constants\KeyConstants as Key;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\Translator;
 
@@ -40,7 +39,10 @@ class Validator
     public static function getInstance()
     {
         if (!self::$instance) {
+            print_r('new object');
             self::$instance = new Validator();
+        } else {
+            print_r('old object');
         }
         return self::$instance;
     }
@@ -54,18 +56,14 @@ class Validator
      * @return Validator
      * @throws \Exception
      */
-    public static function validate(array $data, array $rules, array $messages = null)
+    public static function validate(array $data, array $rules, array $messages = null, $locale = 'en')
     {
-        // Create session instance
-        $session = new Session();
-
-        // Create translator and load message file resource to get the messages based on the locale
-        $translator = new Translator($session->get(Key::LOCALE));
+        $translator = new Translator($locale);
         $translator->addLoader('yaml', new YamlFileLoader());
         $translator->addResource(
             'yaml',
-            '../translations/validations.' . $session->get(Key::LOCALE) . '.yml',
-            $session->get(Key::LOCALE)
+            __DIR__ . '/../../../translations/validations.' . $locale . '.yml',
+            $locale
         );
 
         // Create validator object if it does not exist.
@@ -95,7 +93,8 @@ class Validator
                             if (!is_string($data[$k])) {
                                 $validator::$hasError = true;
                                 $validator::$errors[$k] = (isset($messages[$k . Key::STRING])) ?
-                                    $messages[$k . Key::STRING] : $translator->trans(Key::STRING, [Key::TRANS_KEY => $k]);
+                                    $messages[$k . Key::STRING] :
+                                    $translator->trans(Key::STRING, [Key::TRANS_KEY => $k]);
                             }
                             break;
 
@@ -104,7 +103,8 @@ class Validator
                             if (!is_numeric($data[$k])) {
                                 $validator::$hasError = true;
                                 $validator::$errors[$k] = (isset($messages[$k . Key::NUMERIC])) ?
-                                    $messages[$k . Key::NUMERIC] : $translator->trans(Key::NUMERIC, [Key::TRANS_KEY => $k]);
+                                    $messages[$k . Key::NUMERIC] :
+                                    $translator->trans(Key::NUMERIC, [Key::TRANS_KEY => $k]);
                             }
                             break;
 
@@ -114,13 +114,16 @@ class Validator
                             $ml = (int)end($sr);
 
                             if ($ml < 0) {
-                                throw new \Exception($translator->trans(Key::INCORRECT, [Key::TRANS_KEY => Key::MAX]));
+                                throw new \Exception(
+                                    $translator->trans(Key::INCORRECT, [Key::TRANS_KEY => Key::MAX])
+                                );
                             }
 
                             if (strlen($data[$k]) > $ml) {
                                 $validator::$hasError = true;
                                 $validator::$errors[$k] = (isset($messages[$k . Key::MAX])) ?
-                                    $messages[$k . Key::MAX] : $translator->trans(Key::MAX, [Key::TRANS_KEY => $ml]);
+                                    $messages[$k . Key::MAX] :
+                                    $translator->trans(Key::MAX, [Key::TRANS_KEY => $ml]);
                             }
                             break;
 
@@ -130,13 +133,16 @@ class Validator
                             $ml = (int)end($sr);
 
                             if ($ml < 0) {
-                                throw new \Exception($translator->trans(Key::INCORRECT, [Key::TRANS_KEY => Key::MIN]));
+                                throw new \Exception(
+                                    $translator->trans(Key::INCORRECT, [Key::TRANS_KEY => Key::MIN])
+                                );
                             }
 
                             if (strlen($data[$k]) < $ml) {
                                 $validator::$hasError = true;
                                 $validator::$errors[$k] = (isset($messages[$k . Key::MIN])) ?
-                                    $messages[$k . Key::MIN] : $translator->trans(Key::MIN, [Key::TRANS_KEY => $ml]);
+                                    $messages[$k . Key::MIN] :
+                                    $translator->trans(Key::MIN, [Key::TRANS_KEY => $ml]);
                             }
                             break;
 
@@ -188,5 +194,17 @@ class Validator
     public function validationErrors()
     {
         return self::$errors;
+    }
+
+    /**
+     * Destruct the Validator to original stage
+     *
+     * @return void
+     */
+    public function __destruct()
+    {
+        self::$instance = null;
+        self::$hasError = false;
+        self::$errors = [];
     }
 }

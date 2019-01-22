@@ -10,12 +10,14 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\UniqueIndex as MongoDBUnique;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\ORM\Mapping as ORM;
 /**
  * @MongoDB\Document
  * @MongoDB\HasLifecycleCallbacks()
  * @MongoDBUnique("email")
  */
-class User
+class User implements UserInterface
 {
     /**
      * @MongoDB\Id
@@ -32,6 +34,12 @@ class User
      * @MongoDBUnique
      */
     protected $email;
+
+    /**
+     * @MongoDB\Field(type="string")
+     * @MongoDBUnique
+     */
+    protected $username;
 
     /**
      *@MongoDB\Field(type="string")
@@ -62,6 +70,16 @@ class User
      *@MongoDB\Field(type="date")
      */
     protected $updatedAt;
+
+    /**
+     * @ORM\Column(type="array")
+     */
+    private $roles;
+
+    public function __construct()
+    {
+        $this->roles = ['ROLE_USER'];
+    }
 
     /**
      * @return integer
@@ -108,6 +126,18 @@ class User
     {
         return $this->email;
     }
+
+
+    /**
+     * Function to get username
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
 
     /**
      * @param string $address
@@ -178,6 +208,25 @@ class User
     }
 
     /**
+     *  @return string The password
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     *  @return string|null The salt
+     */
+    public function getSalt()
+    {
+        // The bcrypt and argon2i algorithms don't require a separate salt.
+        // You *may* need a real salt if you choose a different encoder.
+        return null;
+    }
+
+
+    /**
      * @param MongoDB\Date $createdAt
      * 
      * @return User
@@ -232,5 +281,17 @@ class User
         $this->updatedAt = new \DateTime();
     }
 
-    
+    /**
+     * Function to get role
+     *
+     * @return array
+     */
+    public function getRoles()
+    {
+        return $this->roles;
+    }
+
+    public function eraseCredentials()
+    {
+    }
 }

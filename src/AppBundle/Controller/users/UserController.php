@@ -17,11 +17,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use AppBundle\Constants\KeyConstants as Key;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends Controller
 {
-
-
     /**
      * Function to signup
      *
@@ -31,13 +30,9 @@ class UserController extends Controller
      * @return JsonResponse
      * @throws \Exception
      */
-    public function signUpAction(Request $request)
+    public function signUpAction(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
         $requestData = $request->request->all();
-
-        // Create session and store the locale
-        $session = $request->getSession();
-        $session->set(Key::LOCALE, $request->getLocale());
 
         // Validate request data
         $validator = Validator::validate($requestData, [
@@ -45,7 +40,7 @@ class UserController extends Controller
             Key::EMAIL => 'required|max:255',
             Key::PHONE => 'digits:10',
             Key::ADDRESS => 'string|max:255',
-            Key::getPasswordKey() => 'string|max:25|min:5'
+            Key::getPasswordKey() => 'required|string|max:25|min:5'
         ]);
 
         try {
@@ -58,12 +53,15 @@ class UserController extends Controller
                     GenericService::$response = ErrorConstants::$generalErrors['ALREADYEXISTS'];
                 } else {
                     $user = new User();
+
+                    $password = $passwordEncoder->encodePassword($user, $requestData[Key::getPasswordKey()]);
+
                     $user->setName($requestData[Key::NAME])
                         ->setEmail($requestData[Key::EMAIL])
                         ->setAddress($requestData[Key::ADDRESS])
                         ->setPhoneNumber($requestData[Key::PHONE])
                         ->setDob($requestData[Key::DOB])
-                        ->setPassword($requestData[Key::getPasswordKey()]);
+                        ->setPassword($password);
                     $dm->persist($user);
                     $dm->flush();
 
@@ -88,7 +86,6 @@ class UserController extends Controller
         );
     }
 
-
     /**
      * Function to get all users in database
      *
@@ -100,7 +97,6 @@ class UserController extends Controller
         $users = $dm->getrepository(User::class)->findAll();
         dd($users);
         return new JsonResponse($users);
-
 
     }
 }
