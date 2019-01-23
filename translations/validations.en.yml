@@ -5,3 +5,4 @@ incorrect: The %key% value is incorrect.
 max: The length of the field must be less than %key%.
 min: The length of the field must be greater than %key%.
 numeric_equal: The length of the field must be numeric and equal to %key%.
+email: The give %key% is not a valid email address.

@@ -18,5 +18,7 @@ final class ErrorConstants
         'NOT_EXISTS' => ['code' => 403, 'status' => 'failed', 'message' => 'error.user.not_exists'],
         'VALIDATION_FAIL' => ['code' => 406, 'status' => 'failed', 'message' => 'error.validation_failed'],
         'INVALID_PASSWORD' => ['code' => 401, 'status' => 'failed', 'message' => 'error.user.invalid_password'],
+        'INVALID_HEADERS' => ['code' => 400, 'status' => 'failed', 'message' => 'error.invalid_headers'],
+        'NOT_AUTHENTICATED' => ['code' => 400, 'status' => 'failed', 'message' => 'error.user.not_authenticated'],
     ];
 }

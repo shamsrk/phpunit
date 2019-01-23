@@ -30,3 +30,5 @@ security:
             #form_login: ~
     encoders:
         AppBundle\Document\User: bcrypt
+    access_control:
+        - { path: ^/admin, roles: ROLE_ADMIN }

@@ -23,7 +23,7 @@ class UserController extends Controller
     /**
      * Function to signup
      *
-     * @Route("/signup", name="signup")
+     * @Route("/signup", name="signup", methods={"POST"})
      *
      * @param Request $request
      * @return JsonResponse
@@ -90,7 +90,7 @@ class UserController extends Controller
     /**
      * Function to signin
      *
-     * @Route("/signin", name="signin")
+     * @Route("/signin", name="signin", methods={"POST"})
      *
      * @param Request $request
      * @return JsonResponse
@@ -169,7 +169,27 @@ class UserController extends Controller
     {
         $dm = $this->get(Key::DOCTRINE_MONGODB)->getManager();
         $users = $dm->getrepository(User::class)->findAll();
-        return new JsonResponse($users);
 
+        return new JsonResponse(array_map(function ($user) {
+            return $user->get();
+        }, $users));
+
+    }
+
+
+    /**
+     * Function to fetch user details
+     *
+     * @Route("/user/details", name="user_details")
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function userDetailsAction(Request $request)
+    {
+        $user = $this->get(Key::DOCTRINE_MONGODB)
+            ->getManager()->getrepository(User::class)
+            ->findOneBy([Key::EMAIL => $request->headers->get(Key::EMAIL)])->get();
+        return new JsonResponse($user);
     }
 }

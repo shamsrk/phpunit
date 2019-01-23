@@ -163,6 +163,19 @@ class Validator
                             }
                             break;
 
+                            // email validation
+                        case Key::EMAIL:
+                            if (!filter_var($data[$k], FILTER_VALIDATE_EMAIL)) {
+                                $validator::$hasError = true;
+                                $validator::$errors[$k] = (isset($messages[$k . Key::EMAIL])) ?
+                                    $messages[$k . Key::EMAIL] :
+                                    $translator->trans(Key::EMAIL, [Key::TRANS_KEY => $k]);
+                            }
+                            break;
+
+                        default:
+                            break;
+
                     }
                 }
 

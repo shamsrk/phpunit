@@ -78,3 +78,10 @@ doctrine_mongodb:
     document_managers:
         default:
             auto_mapping: true
+
+monolog:
+    handlers:
+        request:
+            type: stream
+            path: '%kernel.logs_dir%/apiRequest.log'
+            level: debug

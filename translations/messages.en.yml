@@ -1,9 +1,12 @@
 error:
+  invalid_headers: request headers are incorrect.
+  validation_failed: User data validation failed.
+
   user:
     already_exists: User already exists.
     not_exists: User does not exists.
     invalid_password: Password is incorrect.
-  validation_failed: User data validation failed.
+    not_authenticated: User is not authenticated.
 
 info:
   user:

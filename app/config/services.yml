@@ -4,6 +4,10 @@ parameters:
     #parameter_name: value
 
 services:
+    kernel.listener.request_listener:
+        class: AppBundle\EventListener\RequestListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.request }
     # default configuration for services in *this* file
     _defaults:
         # automatically injects dependencies in your services
@@ -33,3 +37,8 @@ services:
     # AppBundle\Service\ExampleService:
     #     arguments:
     #         $someArgument: 'some_value'
+
+    general_service:
+        class: AppBundle\Services\GenericService
+        public: true
+        arguments: ["@doctrine_mongodb.odm.document_manager","@logger","@translator"]
