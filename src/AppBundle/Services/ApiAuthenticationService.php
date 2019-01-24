@@ -90,7 +90,7 @@ class ApiAuthenticationService
         $user = $this->mongoManager->getrepository(User::class)
             ->findOneBy([Key::EMAIL => $headers[Key::EMAIL], 'sessionId' => $headers[Key::SESSION_ID]]);
 
-        // User not authenticated
+        // User not authenticated, User can be active for 24 hours from last activity
         if (!(boolean)$user || ((new \DateTime())->diff($user->getLastActiveAt())->h) > 24) {
             return array_merge(
                 ErrorConstants::$generalErrors['NOT_AUTHENTICATED'],

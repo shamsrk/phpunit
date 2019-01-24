@@ -9,6 +9,7 @@ error:
     not_authenticated: User is not authenticated.
 
 info:
+  request_success: Request successfull for %key%.
   user:
     signup_success: Successfully singed up.
     signin_success: Successfully signed in.

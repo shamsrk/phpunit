@@ -190,6 +190,13 @@ class UserController extends Controller
         $user = $this->get(Key::DOCTRINE_MONGODB)
             ->getManager()->getrepository(User::class)
             ->findOneBy([Key::EMAIL => $request->headers->get(Key::EMAIL)])->get();
-        return new JsonResponse($user);
+
+        GenericService::$response = array_merge(
+            MessageConstants::$generalInfo['REQUEST_SUCCESS'], [Key::DATA => $user]
+        );
+
+        return new JsonResponse(GenericService::getResponse(
+            $this->get('translator')->trans(GenericService::$response[Key::MESSAGE], ['%key%' => __FUNCTION__]))
+        );
     }
 }
