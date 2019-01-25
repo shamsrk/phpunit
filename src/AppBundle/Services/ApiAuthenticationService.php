@@ -1,12 +1,13 @@
 <?php
 
-/**
+/*
  * File for Api authentication service.
  *
- * @author
+ * @author <mdshamsreza69@gmail.com>
  *
  * @category Service
  */
+
 namespace AppBundle\Services;
 
 use AppBundle\Constants\ErrorConstants;

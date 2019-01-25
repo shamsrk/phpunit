@@ -1,19 +1,20 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: shams
- * Date: 20/12/18
- * Time: 12:14 PM
+
+/*
+ * This is general service file,
  */
 
 namespace AppBundle\Services;
-
 
 use AppBundle\Constants\KeyConstants as Key;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * GeneralService will provide services for the application, in which we can perform DB operations,
+ * log information etc.
+ */
 class GenericService
 {
     /*
@@ -40,7 +41,12 @@ class GenericService
     /*
      * @var array
     */
-    public static $response = [Key::STATUS => Key::FAILED, Key::CODE => '', Key::MESSAGE => '', Key::DATA => []];
+    public static $response = [
+        Key::STATUS => Key::FAILED,
+        Key::CODE => '',
+        Key::MESSAGE => '',
+        Key::DATA => []
+    ];
 
     /**
      * GenericService constructor.
@@ -48,7 +54,11 @@ class GenericService
      * @param LoggerInterface $logger
      * @param TranslatorInterface $translator
      */
-    public function __construct(DocumentManager $mongoManager, LoggerInterface $logger, TranslatorInterface $translator)
+    public function __construct(
+        DocumentManager $mongoManager,
+        LoggerInterface $logger,
+        TranslatorInterface $translator
+    )
     {
         $this->mongoManager = $mongoManager;
         $this->logger = $logger;
@@ -60,16 +70,30 @@ class GenericService
      *
      * @param null|string $message
      * @param null|string $code
+     * @param string $status
      * @param array $data
      * @return array
      */
-    public static function getResponse($message = null, $code = null, $data = [])
+    public static function getResponse($message = null, $code = null, $status = '', $data = [])
     {
         if ($message) self::$response[Key::MESSAGE] = $message;
         if ($code) self::$response[Key::CODE] = $code;
+        if ($status) self::$response[Key::STATUS] = $status;
         if ($data) self::$response[Key::DATA] = $data;
 
-        return self::$response;
+        return self::response();
+    }
+
+    /**
+     * It will return and reset the response data.
+     *
+     * @return array
+     */
+    private static function response()
+    {
+        $response = self::$response;
+        self::$response = [Key::STATUS => Key::FAILED, Key::CODE => '', Key::MESSAGE => '', Key::DATA => []];
+        return $response;
     }
 
 

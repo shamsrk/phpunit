@@ -54,22 +54,51 @@ class ValidatorTest extends TestCase
                 ],
                 'expected' => [
                     'errorStatus' => true,
-                    'errors' => ['name' => 'name field is required.']
+                    'errors' => ['name' => ['name field is required.']]
                 ]
             ],
             [
                 'signupData' => [
-                    Key::EMAIL => 'sham@gmail.com',
+                    Key::EMAIL => 'shamgmail.com',
+                    Key::PHONE => '8712164261',
+                    Key::getPasswordKey() => '1234'
                 ],
                 'signupRules' => [
-                    Key::EMAIL => 'required|max:255|min:15',
+                    Key::EMAIL => 'email|required|min:15',
+                    Key::PHONE => 'digits:10',
+                    Key::getPasswordKey() => 'required|string|max:25|min:5'
                 ],
                 'expected' => [
                     'errorStatus' => true,
-                    'errors' => ['email' => 'The length of the field must be greater than 15.']
+                    'errors' => [
+                        'email' => [
+                            'The given email is not a valid email address.',
+                            'The length of the field must be greater than 15.'
+                        ],
+                        'password' => [
+                            'The length of the field must be greater than 5.'
+                        ]
+                    ]
                 ]
             ],
         ];
+    }
+
+    /**
+     * Test Validator service multiple behaviours
+     */
+    public function testValidator()
+    {
+        $this->validator = Validator::getInstance();
+
+        // test validator getInstance
+        $this->assertInstanceOf(Validator::class, $this->validator);
+
+        // test validator initial hasError flag
+        $this->assertFalse($this->validator->fails());
+
+        // test validator initial errors
+        $this->assertEmpty($this->validator->validationErrors());
     }
 
     /**

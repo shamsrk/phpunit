@@ -1,54 +1,78 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: shams
- * Date: 18/1/19
- * Time: 2:40 PM
+
+/*
+ * User controller file to test UserController
  */
 
 namespace Tests\AppBundle\Controller\users;
 
-
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * UserControllerTest is a test class to perform test cases for user basic actions
+ */
 class UserControllerTest extends WebTestCase
 {
     /**
-     * Funtion to test the signup api
+     * Sign up data provider for testing sign up action
+     *
+     * @return array
      */
-    public function testSignUpAction()
+    public function signupDataProvider()
     {
-        // Actual data passing to the signup api, change the details to test different cases
-        $actual = [
-            'name' => 'Shams',
-            'email' => 'shamsaq1@gmail.com',
-            'phone' => '8712164261',
-            'address' => 'Patia, Bhubaneswar',
-            'password' => '12345',
-            'dob' => '07-12-2019'
+        return [
+            [
+                'actual' => [
+                    'name' => 'Shams',
+                    'email' => 'shamsaq1@gmail.com',
+                    'phone' => '8712164261',
+                    'address' => 'Patia, Bhubaneswar',
+                    'password' => '12345',
+                    'dob' => '07-12-2019'
+                ],
+                'expected' => [
+                    'code' => 406,
+                    'status' => 'failed',
+                    'message' => 'User data validation failed.',
+                    'data' => [
+                        'username' => [
+                            'username field is required.'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'actual' => [
+                    'name' => 'Shams',
+                    'email' => 'shamsaq1@gmail.com',
+                    'username' => 'shamsaq1@gmail.com',
+                    'phone' => '8712164261',
+                    'address' => 'Patia, Bhubaneswar',
+                    'password' => '12345',
+                    'dob' => '07-12-2019'
+                ],
+                'expected' => [
+                    'code' => 409,
+                    'status' => 'failed',
+                    'message' => 'User already exists.',
+                ]
+            ]
         ];
+    }
 
+    /**
+     * Function to test the sign up api
+     *
+     * @dataProvider signupDataProvider
+     */
+    public function testSignUpAction($actual, $expected)
+    {
         $client = static::createClient();
         $client->request('post', '/signup', $actual);
-
-        $expected = [
-            'code' => 409,
-            'status' => 'failed',
-            'message' => 'User already exists.'
-        ];
-
-//        unset($actual['password']);
-//        $expected = [
-//            'code' => 200,
-//            'status' => 'pass',
-//            'message' => 'Successfully singed up.',
-//            'data' => $actual
-//        ];
 
         $this->assertJsonStringEqualsJsonString(
             json_encode($expected),
             $client->getResponse()->getContent()
         );
     }
-
 }
