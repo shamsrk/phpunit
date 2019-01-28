@@ -52,7 +52,8 @@ class ApiAuthenticationService
      */
     public function __construct(
         DocumentManager $mongoManager, LoggerInterface $logger, TranslatorInterface $translator
-    ){
+    )
+    {
         $this->mongoManager = $mongoManager;
         $this->logger = $logger;
         $this->translator = $translator;

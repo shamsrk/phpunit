@@ -1,9 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: shams
- * Date: 24/12/18
- * Time: 2:43 PM
+/*
+ * User entity file
  */
 
 namespace AppBundle\Document;
@@ -12,7 +9,10 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\UniqueIndex as MongoDBUnique;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
+
 /**
+ * User entity class
+ *
  * @MongoDB\Document
  * @MongoDB\HasLifecycleCallbacks()
  * @MongoDBUnique("email")
@@ -64,52 +64,52 @@ class User implements UserInterface
     protected $username;
 
     /**
-     *@MongoDB\Field(type="string")
+     * @MongoDB\Field(type="string")
      */
     protected $phoneNumber;
 
     /**
-     *@MongoDB\Field(type="string")
+     * @MongoDB\Field(type="string")
      */
     protected $address;
 
     /**
-     *@MongoDB\Field(type="date")
+     * @MongoDB\Field(type="date")
      */
     protected $dob;
 
     /**
-     *@MongoDB\Field(type="string")
+     * @MongoDB\Field(type="string")
      */
     private $plainPassword;
 
     /**
-     *@MongoDB\Field(type="string")
+     * @MongoDB\Field(type="string")
      */
     protected $password;
 
     /**
-     *@MongoDB\Field(type="date")
+     * @MongoDB\Field(type="date")
      */
     protected $createdAt;
 
     /**
-     *@MongoDB\Field(type="date")
+     * @MongoDB\Field(type="date")
      */
     protected $updatedAt;
 
     /**
-     *@MongoDB\Field(type="string")
+     * @MongoDB\Field(type="string")
      */
     protected $sessionId;
 
     /**
-     *@MongoDB\Field(type="date")
+     * @MongoDB\Field(type="date")
      */
     protected $lastActiveAt;
 
     /**
-     *@MongoDB\Field(type="string")
+     * @MongoDB\Field(type="string")
      */
     protected $deviceId;
 
@@ -118,12 +118,17 @@ class User implements UserInterface
      */
     protected $roles;
 
+    /**
+     * User constructor.
+     */
     public function __construct()
     {
         $this->roles = serialize(['ROLE_USER']);
     }
 
     /**
+     * Function to get roles
+     *
      * @return array
      */
     public function getRoles()
@@ -132,6 +137,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to set roles
+     *
      * @param array $roles
      * @return User
      */
@@ -142,6 +149,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get id
+     *
      * @return integer
      */
     public function getId()
@@ -150,8 +159,9 @@ class User implements UserInterface
     }
 
     /**
+     * Function to set name
+     *
      * @param string $name
-     * 
      * @return User
      */
     public function setName($name): User
@@ -161,6 +171,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get name
+     *
      * @return string
      */
     public function getName()
@@ -169,8 +181,9 @@ class User implements UserInterface
     }
 
     /**
-     * @param string $email
+     * Function to set email
      *
+     * @param string $email
      * @return User
      */
     public function setEmail($email): User
@@ -180,6 +193,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get email
+     *
      * @return string
      */
     public function getEmail()
@@ -210,8 +225,9 @@ class User implements UserInterface
 
 
     /**
+     * Function to set address
+     *
      * @param string $address
-     * 
      * @return User
      */
     public function setAddress($address): User
@@ -221,6 +237,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get address
+     *
      * @return string
      */
     public function getAddress()
@@ -229,8 +247,9 @@ class User implements UserInterface
     }
 
     /**
+     * Function to set phone number
+     *
      * @param string $phoneNumber
-     * 
      * @return User
      */
     public function setPhoneNumber($phoneNumber): User
@@ -240,6 +259,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get phone number
+     *
      * @return string
      */
     public function getPhoneNumber()
@@ -248,8 +269,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to set dob
      * @param MongoDB\Date $dob
-     * 
      * @return User
      */
     public function setDob($dob): User
@@ -259,6 +280,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get dob
+     *
      * @return MongoDB\Date
      */
     public function getDob()
@@ -267,6 +290,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get plainPassword
+     *
      * @return string
      */
     public function getPlainPassword()
@@ -274,6 +299,12 @@ class User implements UserInterface
         return $this->plainPassword;
     }
 
+    /**
+     * Function to set plainPassword
+     *
+     * @param $password
+     * @return $this
+     */
     public function setPlainPassword($password)
     {
         $this->plainPassword = $password;
@@ -281,8 +312,9 @@ class User implements UserInterface
     }
 
     /**
-     * @param string $password
+     * Function to set password
      *
+     * @param string $password
      * @return User;
      */
     public function setPassword($password): User
@@ -292,7 +324,9 @@ class User implements UserInterface
     }
 
     /**
-     *  @return string The password
+     * Function to get password
+     *
+     * @return string The password
      */
     public function getPassword()
     {
@@ -300,7 +334,9 @@ class User implements UserInterface
     }
 
     /**
-     *  @return string|null The salt
+     * Implementing function from UserInterface
+     *
+     * @return string|null The salt
      */
     public function getSalt()
     {
@@ -311,8 +347,9 @@ class User implements UserInterface
 
 
     /**
+     * Function to set created date time
+     *
      * @param MongoDB\Date $createdAt
-     * 
      * @return User
      */
     public function setCreatedAt($createdAt): User
@@ -322,6 +359,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get created date time
+     *
      * @return MongoDB\Date
      */
     public function getCreatedAt()
@@ -330,8 +369,9 @@ class User implements UserInterface
     }
 
     /**
+     * Function to set updated date time
+     *
      * @param MongoDB\Date $updatedAt
-     * 
      * @return User
      */
     public function setUpdatedAt($updatedAt): User
@@ -341,6 +381,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get updated date time
+     *
      * @return MongoDB\Date
      */
     public function getUpdatedAt()
@@ -350,6 +392,8 @@ class User implements UserInterface
 
 
     /**
+     * Auto call this function on pre persist
+     *
      * @MongoDB\PrePersist
      */
     public function onPrePersist()
@@ -358,6 +402,8 @@ class User implements UserInterface
     }
 
     /**
+     * Auto call this function on pre update
+     *
      * @MongoDB\PreUpdate
      */
     public function onPreUpdate()
@@ -365,13 +411,17 @@ class User implements UserInterface
         $this->updatedAt = new \DateTime();
     }
 
+    /**
+     * Erase credential, implementing function from UserInterface
+     */
     public function eraseCredentials()
     {
     }
 
     /**
-     * @param MongoDB\Date $lastActiveAt
+     * Function to set lastActiveAt
      *
+     * @param MongoDB\Date $lastActiveAt
      * @return User
      */
     public function setLastActiveAt($lastActiveAt): User
@@ -381,6 +431,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get lastActiveAt
+     *
      * @return MongoDB\Date
      */
     public function getLastActiveAt()
@@ -389,6 +441,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to set session id
+     *
      * @param string $sessionId
      * @return User
      */
@@ -399,6 +453,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get session id
+     *
      * @return string
      */
     public function getSessionId()
@@ -407,6 +463,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to set device id
+     *
      * @param string $deviceId
      * @return User
      */
@@ -417,6 +475,8 @@ class User implements UserInterface
     }
 
     /**
+     * Function to get device id
+     *
      * @return string
      */
     public function getDeviceId()

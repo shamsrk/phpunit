@@ -28,4 +28,11 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <logging>
+        <log type="coverage-clover" target="tests/report/tests-clover.xml" />
+        <log type="junit" target="tests/report/tests-junit.xml" />
+        <log type="coverage-html" target="tests/report" />
+        <log type="testdox-html" target="tests/report/testdox.html" />
+    </logging>
 </phpunit>

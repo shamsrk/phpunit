@@ -1,14 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: shams
- * Date: 17/1/19
- * Time: 1:10 PM
+/*
+ * Key constant file, it contains all the common keys which are being used frequently in the project
  */
 
 namespace AppBundle\Constants;
 
-
+/**
+ * KeyConstants class, list the constant keys for convenient
+ */
 final class KeyConstants
 {
     const KEY = 'key';
@@ -37,7 +36,13 @@ final class KeyConstants
     const DEVICE_ID = 'device_id';
     const DOCTRINE_MONGODB = 'doctrine_mongodb';
 
-    public static function getPasswordKey(){
+    /**
+     * Get password key
+     *
+     * @return string
+     */
+    public static function getPasswordKey()
+    {
         return 'password';
     }
 }

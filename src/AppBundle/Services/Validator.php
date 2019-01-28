@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * Validator service file to validate the request params
+ */
+
 namespace AppBundle\Services;
 
 use AppBundle\Constants\KeyConstants as Key;
@@ -16,14 +20,14 @@ class Validator
      *
      * @var array
      */
-    protected static $errors = [];
+    protected $errors = [];
 
     /*
      * error flag
      *
      * @var boolean
      */
-    protected static $hasError = false;
+    protected $hasError = false;
 
     /*
      * Validator instance
@@ -33,7 +37,7 @@ class Validator
     private static $instance;
 
     /**
-     * Create it if it doesn't exist.
+     * Create it if it doesn't exist to make singleton class
      *
      * @return Validator
      */
@@ -66,7 +70,7 @@ class Validator
         );
 
         // Create validator object if it does not exist.
-        $validator = self::getInstance();
+        $validator = new Validator();
 
         $errors = [];
 
@@ -76,9 +80,9 @@ class Validator
 
             // required field validation, if required validation failed then skip further validation for the field
             if (in_array(Key::REQUIRED, $rs) && !(isset($data[$k]) && !empty($data[$k]))) {
-                $validator::$hasError = true;
-                $validator::$errors[$k][] = (isset($messages[$k . Key::REQUIRED])) ?
-                    $messages[$k . Key::REQUIRED] :
+                $validator->hasError = true;
+                $validator->errors[$k][] = (isset($messages[$k . '.' . Key::REQUIRED])) ?
+                    $messages[$k . '.' . Key::REQUIRED] :
                     $translator->trans(Key::REQUIRED, [Key::TRANS_KEY => $k]);
                 continue;
             }
@@ -89,9 +93,9 @@ class Validator
                         // string data type validation
                         case Key::STRING:
                             if (!is_string($data[$k])) {
-                                $validator::$hasError = true;
-                                $validator::$errors[$k][] = (isset($messages[$k . Key::STRING])) ?
-                                    $messages[$k . Key::STRING] :
+                                $validator->hasError = true;
+                                $validator->errors[$k][] = (isset($messages[$k . '.' . Key::STRING])) ?
+                                    $messages[$k . '.' . Key::STRING] :
                                     $translator->trans(Key::STRING, [Key::TRANS_KEY => $k]);
                             }
                             break;
@@ -99,9 +103,9 @@ class Validator
                         // numeric data type validation
                         case Key::NUMERIC:
                             if (!is_numeric($data[$k])) {
-                                $validator::$hasError = true;
-                                $validator::$errors[$k][] = (isset($messages[$k . Key::NUMERIC])) ?
-                                    $messages[$k . Key::NUMERIC] :
+                                $validator->hasError = true;
+                                $validator->errors[$k][] = (isset($messages[$k . '.' . Key::NUMERIC])) ?
+                                    $messages[$k . '.' . Key::NUMERIC] :
                                     $translator->trans(Key::NUMERIC, [Key::TRANS_KEY => $k]);
                             }
                             break;
@@ -111,16 +115,16 @@ class Validator
                             $sr = explode(':', $r);
                             $ml = (int)end($sr);
 
-                            if ($ml < 0) {
+                            if ($ml <= 0) {
                                 throw new \Exception(
                                     $translator->trans(Key::INCORRECT, [Key::TRANS_KEY => Key::MAX])
                                 );
                             }
 
                             if (strlen($data[$k]) > $ml) {
-                                $validator::$hasError = true;
-                                $validator::$errors[$k][] = (isset($messages[$k . Key::MAX])) ?
-                                    $messages[$k . Key::MAX] :
+                                $validator->hasError = true;
+                                $validator->errors[$k][] = (isset($messages[$k . '.' . Key::MAX])) ?
+                                    $messages[$k . '.' . Key::MAX] :
                                     $translator->trans(Key::MAX, [Key::TRANS_KEY => $ml]);
                             }
                             break;
@@ -130,16 +134,16 @@ class Validator
                             $sr = explode(':', $r);
                             $ml = (int)end($sr);
 
-                            if ($ml < 0) {
+                            if ($ml <= 0) {
                                 throw new \Exception(
                                     $translator->trans(Key::INCORRECT, [Key::TRANS_KEY => Key::MIN])
                                 );
                             }
 
                             if (strlen($data[$k]) < $ml) {
-                                $validator::$hasError = true;
-                                $validator::$errors[$k][] = (isset($messages[$k . Key::MIN])) ?
-                                    $messages[$k . Key::MIN] :
+                                $validator->hasError = true;
+                                $validator->errors[$k][] = (isset($messages[$k . '.' . Key::MIN])) ?
+                                    $messages[$k . '.' . Key::MIN] :
                                     $translator->trans(Key::MIN, [Key::TRANS_KEY => $ml]);
                             }
                             break;
@@ -157,9 +161,9 @@ class Validator
                             }
 
                             if (!is_numeric($data[$k]) || strlen((int)$data[$k]) !== $ml) {
-                                $validator::$hasError = true;
-                                $validator::$errors[$k][] = (isset($messages[$k . Key::DIGITS])) ?
-                                    $messages[$k . Key::DIGITS] :
+                                $validator->hasError = true;
+                                $validator->errors[$k][] = (isset($messages[$k . '.' . Key::DIGITS])) ?
+                                    $messages[$k . '.' . Key::DIGITS] :
                                     $translator->trans('numeric_equal', [Key::TRANS_KEY => $ml]);
                             }
                             break;
@@ -167,9 +171,9 @@ class Validator
                         // email validation
                         case Key::EMAIL:
                             if (!filter_var($data[$k], FILTER_VALIDATE_EMAIL)) {
-                                $validator::$hasError = true;
-                                $validator::$errors[$k][] = (isset($messages[$k . Key::EMAIL])) ?
-                                    $messages[$k . Key::EMAIL] :
+                                $validator->hasError = true;
+                                $validator->errors[$k][] = (isset($messages[$k . '.' . Key::EMAIL])) ?
+                                    $messages[$k . '.' . Key::EMAIL] :
                                     $translator->trans(Key::EMAIL, [Key::TRANS_KEY => $k]);
                             }
                             break;
@@ -194,7 +198,7 @@ class Validator
      */
     public function fails()
     {
-        return self::$hasError;
+        return $this->hasError;
     }
 
     /**
@@ -204,18 +208,6 @@ class Validator
      */
     public function validationErrors()
     {
-        return self::$errors;
-    }
-
-    /**
-     * Destruct the Validator to original stage
-     *
-     * @return void
-     */
-    public function __destruct()
-    {
-        self::$instance = null;
-        self::$hasError = false;
-        self::$errors = [];
+        return $this->errors;
     }
 }

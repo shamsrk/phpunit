@@ -27,3 +27,6 @@ services:
 
     api.authentication_service:
         class: AppBundle\Services\ApiAuthenticationService
+
+doctrine_mongodb:
+    default_database: 'mydb_test'

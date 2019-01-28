@@ -1,11 +1,13 @@
 <?php
-/**
+/*
  * File for Error code,severity and error message management.
  */
 
 namespace AppBundle\Constants;
 
-
+/**
+ * ErrorConstants class, it generally uses messages.en.yml.
+ */
 final class ErrorConstants
 {
     /*

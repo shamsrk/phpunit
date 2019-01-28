@@ -14,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class GenericServiceTest extends WebTestCase
 {
     /**
-     *
+     * Test generic service if created correctly
      */
     public function testGenericSericeCreated()
     {

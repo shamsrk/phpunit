@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * File to listen request events
  */
 
@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 /*
  * RequestListener class to listen all the request and handle accordingly
  */
+
 class RequestListener
 {
     /*

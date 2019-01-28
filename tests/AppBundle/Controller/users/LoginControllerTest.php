@@ -1,7 +1,7 @@
 <?php
 
 /*
- * User controller file to test UserController
+ * LoginControllerTest file to test Login API
  */
 
 namespace Tests\AppBundle\Controller\users;
@@ -12,18 +12,15 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * UserControllerTest is a test class to perform test cases for user basic actions
+ * LoginControllerTest is a test class to perform test cases for user basic actions
  */
-class UserControllerTest extends WebTestCase
+class LoginControllerTest extends WebTestCase
 {
     /**
      * @var Client
      */
     private static $client;
 
-    /**
-     * @var Client
-     */
     private static $mongoDbConnection;
 
     /**
@@ -51,17 +48,17 @@ class UserControllerTest extends WebTestCase
 
         self::$mongoDbConnection->flush();
 
-        // create user data to test user_details API
+        // create user data to test login API
         $userData = [
             'name' => 'Shams',
             'email' => 'shams@gmail.com',
             'username' => 'shams@gmail.com',
             'password' => '$2y$13$NgkDG6KPvKjXHTTw3nZFbuEd6KVgv.6wwVgqAvTIF.X8WyAFM2SQe', // asbcd
             'phoneNumber' => '8712164261',
-            'address' => 'Patia',
+            'address' => '',
             'dob' => '10-11-2000',
-            'sessionId' => 'y_ioCYS4ZdxxoeeKP3iM_RTqLgSuYuEZZUt0ZYrSX1w',
-            'lastActiveAt' => new \DateTime()
+            'sessionId' => '',
+            'lastActiveAt' => ''
         ];
         $user = new User();
         $user->setUsername($userData['username'])
@@ -75,66 +72,124 @@ class UserControllerTest extends WebTestCase
 
         self::$mongoDbConnection->persist($user);
         self::$mongoDbConnection->flush();
+
     }
 
     /**
-     * User details data provider
+     * user sign in data provider
      *
      * @return array
      */
-    public function userDetailHeaderProvider()
+    public function signinDataProvider()
     {
         return [
             [
-                'headers' => [
-                    'HTTP_email' => 'shams@gmail.com',
-                    'HTTP_session_id' => 'oX4w3KZtXL9Pp6dlpZZ11orAwbDN2cHk7U4fnehSnTc'
+                'data' => [
+                    'password' => '12345',
+                    'device_id' => '123456'
                 ],
                 'expected' => [
-                    'code' => 400,
+                    'code' => 406,
                     'status' => 'failed',
-                    'message' => 'User is not authenticated.'
+                    'message' => 'User data validation failed.',
+                    'data' => [
+                        'username' => [
+                            'username field is required.'
+                        ]
+                    ]
                 ]
             ],
             [
-                'headers' => [
-                    'HTTP_email' => 'shams@gmail.com',
-                    'HTTP_session_id' => 'y_ioCYS4ZdxxoeeKP3iM_RTqLgSuYuEZZUt0ZYrSX1w'
+                'data' => [
+                ],
+                'expected' => [
+                    'code' => 406,
+                    'status' => 'failed',
+                    'message' => 'User data validation failed.',
+                    'data' => [
+                        'username' => [
+                            'username field is required.'
+                        ],
+                        'password' => [
+                            'password field is required.'
+                        ],
+                        'device_id' => [
+                            'device_id field is required.'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'data' => [
+                    'username' => '',
+                    'password' => '',
+                    'device_id' => ''
+                ],
+                'expected' => [
+                    'code' => 406,
+                    'status' => 'failed',
+                    'message' => 'User data validation failed.',
+                    'data' => [
+                        'username' => [
+                            'username field is required.'
+                        ],
+                        'password' => [
+                            'password field is required.'
+                        ],
+                        'device_id' => [
+                            'device_id field is required.'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'data' => [
+                    'username' => 'shams@gmail.com',
+                    'password' => 'asbcd',
+                    'device_id' => '123456'
                 ],
                 'expected' => [
                     'code' => 200,
                     'status' => 'pass',
-                    'message' => 'Request successfull for userDetailsAction.',
-                    'date' => [
-                        'id' => '',
-                        'name' => 'Shams',
+                    'message' => 'Successfully signed in.',
+                    'data' => [
+                        'id' => '5c46ca175af99a174c69cbf9',
+                        'name' => 'shams',
                         'email' => 'shams@gmail.com',
                         'username' => 'shams@gmail.com',
                         'phoneNumber' => '8712164261',
-                        'address' => 'Patia',
+                        'address' => '',
                         'dob' => '',
-                        'sessionId' => 'y_ioCYS4ZdxxoeeKP3iM_RTqLgSuYuEZZUt0ZYrSX1w',
+                        'sessionId' => 'zi7rs_Uc47obasQXowbEXd7hpCkWkfNMGxxiEfTXNR0',
                         'lastActiveAt' => ''
                     ]
+                ]
+            ],
+            [
+                'data' => [
+                    'username' => 'shamsreza@gmail.com',
+                    'password' => 'asbcd',
+                    'device_id' => '123456'
+                ],
+                'expected' => [
+                    'code' => 403,
+                    'status' => 'failed',
+                    'message' => 'User does not exists.',
                 ]
             ]
         ];
     }
 
     /**
-     * Test funtion to get user details
+     * user sign in test function
      *
-     * @dataProvider userDetailHeaderProvider
+     * @dataProvider signinDataProvider
      */
-    public function testUserDetailsAction($headers, $expected)
+    public function testLoginAction($data, $expected)
     {
-        self::$client->request(
-            'get',
-            '/user/details',
-            [],
-            [],
-            $headers
-        );
+        self::$client->request('post', '/signin', $data);
+
+        $this->assertEquals(200, self::$client->getResponse()->getStatusCode());
 
         $response = json_decode(self::$client->getResponse()->getContent(), true);
 
@@ -153,18 +208,16 @@ class UserControllerTest extends WebTestCase
             $this->assertArrayHasKey('lastActiveAt', $response['data']);
 
             $this->assertNotEmpty($response['data']['sessionId']);
-            $this->assertNotEmpty($response['data']['lastActiveAt']);
         } else {
             $this->assertEquals($expected, $response);
         }
     }
 
     /**
-     * Remove all the inserted data
+     * tearDownAfterClass, to remove all the new insertions
      */
     public static function tearDownAfterClass()
     {
-        // remove all the records from User collection
         $users = self::$mongoDbConnection->getRepository(User::class)->findAll();
 
         foreach ($users as $user) {
