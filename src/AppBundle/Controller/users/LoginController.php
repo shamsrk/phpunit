@@ -60,9 +60,14 @@ class LoginController extends Controller
                     if ($encoder->isPasswordValid($user->getPassword(),
                         $requestData[Key::getPasswordKey()], $user->getSalt())) {
 
+                        // Check if already not logged in, then create session id
+                        if (!(trim($user->getSessionId()) &&
+                            ((new \DateTime())->diff($user->getLastActiveAt())->h) <= 24)) {
+                            $user->setSessionId(generateToken());
+                        }
+
                         // update the sessionId, lastActiveAt, devicedId
-                        $user->setSessionId(generateToken())
-                            ->setLastActiveAt(new \DateTime())
+                        $user->setLastActiveAt(new \DateTime())
                             ->setDeviceId($requestData[Key::DEVICE_ID]);
 
                         $dm->persist($user);
