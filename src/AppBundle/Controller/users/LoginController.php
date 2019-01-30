@@ -66,7 +66,7 @@ class LoginController extends Controller
                             $user->setSessionId(generateToken());
                         }
 
-                        // update the sessionId, lastActiveAt, devicedId
+                        // update the lastActiveAt, devicedId
                         $user->setLastActiveAt(new \DateTime())
                             ->setDeviceId($requestData[Key::DEVICE_ID]);
 
