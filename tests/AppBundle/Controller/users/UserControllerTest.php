@@ -9,7 +9,6 @@ namespace Tests\AppBundle\Controller\users;
 use AppBundle\Document\User;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * UserControllerTest is a test class to perform test cases for user basic actions
