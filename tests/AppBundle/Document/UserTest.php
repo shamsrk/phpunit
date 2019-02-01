@@ -6,24 +6,41 @@
 namespace AppBundle\Document;
 
 use PHPUnit\Framework\TestCase;
+
 /**
  * UserTest class to test the User entity
  */
 class UserTest extends TestCase
 {
+    /*
+     * @var User $user
+     */
     private static $user;
 
+    /**
+     * set user before initializing the class
+     */
     public static function setUpBeforeClass()
     {
         self::$user = new User();
-   }
+    }
 
+    /**
+     * Test if User class instantiates successfully
+     */
     public function testUserCreated()
     {
         $this->assertInstanceOf(User::class, self::$user);
-   }
+    }
 
-   public function userDataProvider() {
+    /**
+     * User data provider to check User object
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function userDataProvider()
+    {
         return [
             [
                 'setter' => 'setRoles',
@@ -124,7 +141,7 @@ class UserTest extends TestCase
                 'severity' => 'equal'
             ]
         ];
-   }
+    }
 
     /**
      * Function to test the User setters and getters functions
@@ -133,10 +150,12 @@ class UserTest extends TestCase
      */
     public function testUserSetters($setter, $getter, $data, $expected, $severity)
     {
+        // setters will return User instance
         if (!empty($setter) && !empty($data)) {
             $this->assertInstanceOf(User::class, self::$user->$setter($data));
         }
 
+        // test getters
         if (!empty($getter) && !empty($expected)) {
             if ($severity == 'date') {
                 $this->assertEquals($expected->format('d-m-Y'), self::$user->$getter()->format('d-m-Y'));
@@ -144,5 +163,5 @@ class UserTest extends TestCase
                 $this->assertEquals($expected, self::$user->$getter());
             }
         }
-   }
+    }
 }
